@@ -8,14 +8,14 @@ os.environ['SDL_VIDEO_WINDOW_POS'] = '0,0'
 
 pygame.init()
 
-FPS = 60
+FPS = 120
 clock = pygame.time.Clock()
 
 Info = pygame.display.Info()
 W, H = Info.current_w, Info.current_h
 
 MAX_SNOW = 150
-BG_COLOR = (143, 78, 157)
+BG_COLOR = (67, 215, 175)
 
 
 class Snow(pygame.sprite.Sprite):
@@ -34,10 +34,21 @@ class Snow(pygame.sprite.Sprite):
         self.rot = 0
         self.angle = random.randint(-1, 1)
 
+    def update(self):
+        self.rect.y += self.speed
+        if self.rect.top > H:
+            self.rect.bottom = 0
+
+        # self.rot = (self.rot + self.angle) % 360
+        self.rot += self.angle
+        self.image = pygame.transform.rotate(self.image_orig, self.rot)
+        self.rect = self.image.get_rect(center=self.rect.center)  
+
 
 def check_for_exit():
     for e in pygame.event.get():
-        if e.type == pygame.QUIT or e.type == pygame.KEYDOWN and e.key == pygame.K_ESCAPE:
+        if e.type == pygame.QUIT or e.type == pygame.KEYDOWN \
+                 and e.key == pygame.K_ESCAPE:
             sys.exit(0)
 
 
@@ -59,6 +70,7 @@ init_snow(MAX_SNOW)
 while True:
     check_for_exit()
     snowgroup.update()
+    screen.fill(BG_COLOR)
     snowgroup.draw(screen)
     pygame.display.update()
     clock.tick(FPS)
